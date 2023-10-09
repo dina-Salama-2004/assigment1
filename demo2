@@ -1,0 +1,213 @@
+#include <fstream>
+#include <cstring>
+#include <cmath>
+#include "bmplib.cpp"
+
+using namespace std;
+unsigned char image[SIZE][SIZE];
+unsigned char image2[SIZE][SIZE];
+unsigned char image3[SIZE][SIZE];
+
+
+void loadImage() {
+    char imageFileName[100];
+    cin >> imageFileName;
+    strcat(imageFileName, ".bmp");
+    readGSBMP(imageFileName, image);
+}
+void loadSecondImage() {
+    char imageFileName2[100];
+    cout << "Enter the image which will be meraged with the first image ";
+    cin >> imageFileName2;
+    strcat(imageFileName2, ".bmp");
+    readGSBMP(imageFileName2, image2);
+}
+void saveImage() {
+    char imageFileName[100];
+    cout << "Enter the target image file name: ";
+    cin >> imageFileName;
+    strcat(imageFileName, ".bmp");
+    writeGSBMP(imageFileName, image);
+}
+void saveImage3() {
+    char imageFileName[100];
+    cout << "Enter the target image file name: ";
+    cin >> imageFileName;
+    strcat(imageFileName, ".bmp");
+    writeGSBMP(imageFileName, image3);
+}
+
+void black_white() {
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (image[i][j] > 127) {
+                image[i][j] = 255;
+            }
+            else {
+                image[i][j] = 0;
+            }
+        }
+    }
+   
+}
+void invert() {
+   
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+
+            image[i][j] = 256 - image[i][j];
+        }
+    }
+  
+}
+void merge() {
+    
+    loadSecondImage();
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            image3[i][j] = (image[i][j] + image2[i][j]) / 2;
+        }
+    }
+    
+}
+void flip_vertically() {
+    
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            image3[i][j] = image[i][255 - j];
+        }
+    }
+   
+}
+void flip_horizontally() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            image3[i][j] = image[255 - i][j];
+        }
+    }
+ 
+}
+void doRotation_90() {
+  
+    for (int j = 0; j < SIZE; j++) {
+        for (int i = SIZE - 1; i >= 0; i--) {
+            image3[j][SIZE - i + 1] = image[i][j];
+        }
+    }
+   
+}
+void doRotation_180() {
+   
+    for (int i = SIZE - 1; i >= 0; i--) {
+        for (int j = SIZE - 1; j >= 0; j--) {
+            image3[SIZE - i + 1][SIZE - j + 1] = image[i][j];
+        }
+    }
+   
+}
+void doRotation_270() {
+   
+    for (int j = SIZE - 1; j >= 0; j--) {
+        for (int i = 0; i < SIZE; i++) {
+            image3[SIZE - j + 1][i] = image[i][j];
+        }
+    }
+    
+}
+void lighterByHalf() {
+
+  for (int i = 0; i < SIZE; i++)
+   {
+    for (int j = 0; j< SIZE; j++)
+     { 
+      if((image[i][j]+(image[i][j]/2))<255 )
+    image[i][j]=(image[i][j]+(image[i][j]/2));
+      else
+      image[i][j]=255;
+     }
+   }
+
+}
+void darkerByHalf() {
+  
+  for (int i = 0; i < SIZE; i++)
+   {
+    for (int j = 0; j< SIZE; j++)
+     { 
+       if((image[i][j]-(image[i][j]/2))>0 )
+    image[i][j]=(image[i][j]-(image[i][j]/2));
+      else
+      image[i][j]=0;
+
+     }
+   }
+ 
+}
+
+int main()
+{
+    cout << "Ahlan ya user ya habibi \nPlease enter file name of the image to process: \n";
+    loadImage();
+    string Namefilter;
+   cout<<"Please select a filter to apply or 0 to exit:\n";
+   cout<<"1- Black & White Filter\n2- Invert Filter\n3- Merge Filter\n4- Flip Image\n5- Darken and Lighten Image\n6- Rotate Image\n";
+cin>>Namefilter;
+    if (Namefilter[0] == '1') {
+        black_white();
+        saveImage();
+    }
+    else if (Namefilter[0]== '2') {
+        invert();
+        saveImage();
+    }
+    else if (Namefilter[0]== '3') {
+        merge();
+        saveImage3();
+    }
+    else if (Namefilter[0]== '4') {
+      char ch;
+        cout << "Choose flip vertically or horizontally (v / h): \n";
+        cin >> ch;
+        if (ch == 'v') {
+            flip_vertically();
+            saveImage3();
+        }
+        else if (ch == 'h') {
+            flip_horizontally();
+            saveImage3();
+        }
+    }
+    else if (Namefilter[0] == '6') {
+        cout << "Choose the degree of rotation (90 / 180 / 270): \n";
+        int degreeRptation; cin >> degreeRptation;
+        if (degreeRptation == 90) {
+            doRotation_90();
+        }
+        else if (degreeRptation == 180) {
+            doRotation_180();
+        }
+        else if (degreeRptation == 270) {
+            doRotation_270();
+        }
+        saveImage3();
+    }
+    else if(Namefilter[0]=='5')
+    {
+     char ch;
+    cout<<"choose the image darker or lighter (d/l)";
+     cin>>ch;
+     
+      if(ch=='d'){
+         darkerByHalf();
+          saveImage();
+      }
+      else if(ch=='l'){
+        lighterByHalf();
+        saveImage(); 
+      }
+     
+    }
+    
+   return 0;
+}
